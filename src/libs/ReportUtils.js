@@ -1762,14 +1762,6 @@ function buildOptimisticIOUReportAction(type, amount, currency, comment, partici
     };
 }
 
-/**
- * Builds an optimistic report preview action with a randomly generated reportActionID.
- *
- * @param {Object} chatReport
- * @param {Object} iouReport
- *
- * @returns {Object}
- */
 function buildOptimisticReportPreview(chatReport, iouReport) {
     const message = getReportPreviewMessage(iouReport);
     return {
@@ -1791,30 +1783,6 @@ function buildOptimisticReportPreview(chatReport, iouReport) {
         created: DateUtils.getDBTime(),
         accountID: iouReport.managerID || 0,
         actorAccountID: iouReport.managerID || 0,
-    };
-}
-
-/**
- * Updates a report preview action that exists for an IOU report.
- *
- * @param {Object} iouReport
- * @param {Object} reportPreviewAction
- *
- * @returns {Object}
- */
-function updateReportPreview(iouReport, reportPreviewAction) {
-    const message = getReportPreviewMessage(iouReport, reportPreviewAction);
-    return {
-        ...reportPreviewAction,
-        created: DateUtils.getDBTime(),
-        message: [
-            {
-                html: message,
-                text: message,
-                isEdited: false,
-                type: CONST.REPORT.MESSAGE.TYPE.COMMENT,
-            },
-        ],
     };
 }
 
@@ -2831,7 +2799,6 @@ export {
     buildOptimisticExpenseReport,
     buildOptimisticIOUReportAction,
     buildOptimisticReportPreview,
-    updateReportPreview,
     buildOptimisticTaskReportAction,
     buildOptimisticAddCommentReportAction,
     buildOptimisticTaskCommentReportAction,
