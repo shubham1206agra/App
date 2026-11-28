@@ -1296,9 +1296,9 @@ describe('actions/Report', () => {
             })
             .then(() => {
                 // Ensure we show a notification for this new report action
-                expect(Report.showReportActionNotification).toBeCalledWith(
+                expect(Report.showReportActionNotification).toHaveBeenCalledWith(
                     REPORT_ID,
-                    REPORT_ACTION,
+                    expect.objectContaining(REPORT_ACTION),
                     undefined,
                     TEST_USER_ACCOUNT_ID,
                     TEST_USER_LOGIN,
@@ -6659,6 +6659,7 @@ describe('actions/Report', () => {
                 predictedNextStatus: CONST.REPORT.STATUS_NUM.SUBMITTED,
                 isTrackIntentUser: false,
                 personalDetailsByLogins: getPolicyOwnerPersonalDetailsByLogins(policy),
+                rules: undefined,
             });
         });
 
