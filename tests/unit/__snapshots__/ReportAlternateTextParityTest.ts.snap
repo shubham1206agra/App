@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`getOptionData alternateText parity snapshots branches with bespoke payloads ACTIONABLE_CARD_FRAUD_ALERT with resolution 1`] = `"cleared the suspicious activity and reactivated card x4444. All set to keep expensing!"`;
 

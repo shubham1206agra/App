@@ -802,7 +802,7 @@ describe('DebugUtils', () => {
                 new SyntaxError('debug.invalidProperty', {
                     cause: {
                         propertyName: 'accountID',
-                        expectedType: 'number | undefined',
+                        expectedType: 'number | undefined | ""',
                     },
                 }),
             );

@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`Column availability single source of truth the derived picker lists match their snapshots: REPORT_DETAILS_CUSTOM_COLUMNS 1`] = `
 [

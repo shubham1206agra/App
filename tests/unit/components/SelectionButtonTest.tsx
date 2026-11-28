@@ -295,6 +295,8 @@ describe('SelectionButton shift+mousedown', () => {
         attachedNodes.push(text);
         const range = document.createRange();
         range.selectNodeContents(text);
+        // jsdom ignores addRange while the selection already holds a range, so clear any range left from earlier steps
+        window.getSelection()?.removeAllRanges();
         window.getSelection()?.addRange(range);
         expect(window.getSelection()?.isCollapsed).toBe(false);
         getCapturedMouseDown()(makeMouseDownEvent(true));
