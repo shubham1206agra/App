@@ -14,5 +14,5 @@
     ```
 
 - Upstream PR/issue: None. React Native's own preset runs tests in its Node-based `react-native-env`, where `window` is not defined yet, so the redefinition only breaks when an app overrides `testEnvironment` to `jsdom` as we do. The setup is unchanged as of `0.90.0-nightly`. The patch can be removed if we stop running the React Native setup under `jsdom`.
-- E/App issue: 🛑 TODO
-- PR introducing patch: 🛑 TODO
+- E/App issue: https://github.com/Expensify/App/issues/108261
+- PR introducing patch: https://github.com/Expensify/App/pull/108259
