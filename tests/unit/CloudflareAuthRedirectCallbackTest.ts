@@ -44,20 +44,16 @@ let nowSpy: jest.SpyInstance;
 
 /** Points jsdom at the callback URL without triggering a real navigation */
 function arrangeCallbackURL(search: string) {
-    Object.defineProperty(window, 'location', {
-        value: {origin: 'http://localhost', href: `http://localhost/oauth/callback${search}`, pathname: '/oauth/callback'},
-        writable: true,
-        configurable: true,
-    });
+    setDocumentURL(`http://localhost/oauth/callback${search}`);
 }
 
-let realLocation: Location;
+let realURL: string;
 
 beforeEach(() => {
     jest.resetModules();
     mockLogWarn.mockClear();
     window.localStorage.clear();
-    realLocation = window.location;
+    realURL = window.location.href;
     mockQAAuth.CLIENT_ID = 'client-123';
     nowSpy = jest.spyOn(Date, 'now').mockReturnValue(FLOW.createdAt);
     replaceStateSpy = jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
@@ -70,7 +66,7 @@ beforeEach(() => {
 afterEach(() => {
     replaceStateSpy.mockRestore();
     nowSpy.mockRestore();
-    Object.defineProperty(window, 'location', {value: realLocation, writable: true, configurable: true});
+    setDocumentURL(realURL);
 });
 
 function runBoot() {
@@ -82,11 +78,7 @@ describe('the boot-time QA auth callback handling', () => {
     it('is a no-op off the callback path: every normal boot runs this', () => {
         // Given a pending flow saved by another tab's in-flight round trip, while this boot sits on an ordinary app route
         pendingAuthFlowStorage.savePendingAuthFlow(FLOW);
-        Object.defineProperty(window, 'location', {
-            value: {origin: 'http://localhost', href: RETURN_URL, pathname: '/settings/troubleshoot'},
-            writable: true,
-            configurable: true,
-        });
+        setDocumentURL(RETURN_URL);
 
         // When the boot-time handler runs, as it does on every boot
         // Then it must be a complete no-op (no URL rewrite, no exchange), because treating an ordinary boot as a callback would corrupt unrelated state
@@ -101,11 +93,7 @@ describe('the boot-time QA auth callback handling', () => {
         // Given a round trip abandoned on the Authorize screen, whose record has since expired, and a later ordinary boot on an app route
         pendingAuthFlowStorage.savePendingAuthFlow(FLOW);
         nowSpy.mockReturnValue(FLOW.createdAt + 11 * 60 * 1000);
-        Object.defineProperty(window, 'location', {
-            value: {origin: 'http://localhost', href: RETURN_URL, pathname: '/settings/troubleshoot'},
-            writable: true,
-            configurable: true,
-        });
+        setDocumentURL(RETURN_URL);
 
         // When the boot-time handler runs
         runBoot();

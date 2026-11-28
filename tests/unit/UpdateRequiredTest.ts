@@ -6,6 +6,7 @@ import ONYXKEYS from '@src/ONYXKEYS';
 import type * as UpdateRequired from '../../src/libs/actions/UpdateRequired/index';
 
 import pkg from '../../package.json';
+import interceptWindowNavigation from '../utils/interceptWindowNavigation';
 import waitForBatchedUpdates from '../utils/waitForBatchedUpdates';
 
 // Factory mocks share these functions across the isolated module registries each test loads.
@@ -43,20 +44,17 @@ function loadWebUpdateRequired(): UpdateRequiredModule {
 describe('UpdateRequired (web)', () => {
     const replaceMock = jest.fn();
     const currentURL = 'https://new.expensify.com/r/123?existing=value#details';
-    const originalLocation = window.location;
+    const originalURL = window.location.href;
+    let restoreNavigation: () => void;
 
     beforeAll(() => {
-        Object.defineProperty(window, 'location', {
-            configurable: true,
-            value: {href: currentURL, replace: replaceMock},
-        });
+        setDocumentURL(currentURL);
+        restoreNavigation = interceptWindowNavigation({replace: replaceMock});
     });
 
     afterAll(() => {
-        Object.defineProperty(window, 'location', {
-            configurable: true,
-            value: originalLocation,
-        });
+        restoreNavigation();
+        setDocumentURL(originalURL);
     });
 
     beforeEach(() => {

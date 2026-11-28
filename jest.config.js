@@ -59,7 +59,8 @@ module.exports = {
         // `performance` is left real only for perf runs (see isPerfTestRun above).
         doNotFake: isPerfTestRun ? ['nextTick', 'performance'] : ['nextTick'],
     },
-    testEnvironment: 'jsdom',
+    // jsdom plus a `setDocumentURL` global, since jsdom 26 no longer lets tests replace `window.location`
+    testEnvironment: '<rootDir>/jest/environment.ts',
     setupFiles: ['<rootDir>/jest/setup.ts', './node_modules/@react-native-google-signin/google-signin/jest/build/setup.js'],
     setupFilesAfterEnv: ['<rootDir>/jest/setupAfterEnv.ts', '<rootDir>/tests/perf-test/setupAfterEnv.ts'],
     // Restarts a worker between suites once it holds this much memory, so long-lived CI workers don't get OOM killed.

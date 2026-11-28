@@ -14,6 +14,7 @@ import type CloudflareSession from '@src/types/onyx/CloudflareSession';
 // Default type import only: a namespace import would pull in the restricted `useOnyx` name
 import type OnyxDefault from 'react-native-onyx';
 
+import interceptWindowNavigation from '../utils/interceptWindowNavigation';
 import waitForBatchedUpdates from '../utils/waitForBatchedUpdates';
 
 type PKCEPair = PKCEModule.PKCEPair;
@@ -64,7 +65,8 @@ let pkce: typeof PKCEModule;
 let pendingAuthFlowStorage: typeof PendingAuthFlowStorageModule;
 let sessionCleanup: typeof SessionCleanupModule;
 let assignSpy: jest.Mock;
-let realLocation: Location;
+let restoreNavigation: () => void;
+let realURL: string;
 let realLocalStorage: Storage;
 
 beforeEach(() => {
@@ -75,13 +77,10 @@ beforeEach(() => {
     realLocalStorage = window.localStorage;
     window.localStorage.clear();
     // jsdom throws "Not implemented: navigation" on a real location.assign
-    realLocation = window.location;
+    realURL = window.location.href;
+    setDocumentURL('http://localhost/settings/troubleshoot');
     assignSpy = jest.fn<void, [string]>();
-    Object.defineProperty(window, 'location', {
-        value: {origin: 'http://localhost', href: 'http://localhost/settings/troubleshoot', pathname: '/settings/troubleshoot', assign: assignSpy},
-        writable: true,
-        configurable: true,
-    });
+    restoreNavigation = interceptWindowNavigation({assign: assignSpy});
     Onyx = require<{default: typeof OnyxDefault}>('react-native-onyx').default;
     ONYXKEYS = require<typeof OnyxKeysModule>('@src/ONYXKEYS').default;
     Onyx.init({keys: ONYXKEYS});
@@ -94,7 +93,8 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-    Object.defineProperty(window, 'location', {value: realLocation, writable: true, configurable: true});
+    restoreNavigation();
+    setDocumentURL(realURL);
     Object.defineProperty(window, 'localStorage', {value: realLocalStorage, writable: true, configurable: true});
     // jsdom ships no Web Locks, so the lock test installs one. Every other test must see it absent again
     Object.defineProperty(navigator, 'locks', {value: undefined, writable: true, configurable: true});

@@ -37,14 +37,14 @@ const {writeExperienceCookie, clearExperienceCookie} = jest.requireActual<typeof
 const HOST_ONLY_DELETE = 'experience=; Max-Age=0; Path=/; Secure; SameSite=Lax';
 
 let cookieSetter: jest.SpyInstance<void, [string]>;
-let realLocation: Location;
+let realURL: string;
 
 /** Points jsdom at the given host without triggering a real navigation */
 function arrangeHostname(hostname: string) {
-    Object.defineProperty(window, 'location', {value: {hostname}, writable: true, configurable: true});
+    setDocumentURL(`https://${hostname}/`);
 }
 
-/** Lists the raw strings written to document.cookie, since jsdom drops cookies whose Domain doesn't match its own URL */
+/** Lists the raw strings written to document.cookie, since reading document.cookie back drops the Domain and Max-Age attributes these tests check */
 function getCookieWrites(): string[] {
     return cookieSetter.mock.calls.map(([cookie]) => cookie);
 }
@@ -52,7 +52,7 @@ function getCookieWrites(): string[] {
 beforeEach(() => {
     mockEnvironment = CONST.ENVIRONMENT.DEV;
     mockExpensifyURL = 'https://www.expensify.com.dev/';
-    realLocation = window.location;
+    realURL = window.location.href;
 
     // jsdom defines cookie as an accessor on Document.prototype, and its setter throws when called with another receiver
     cookieSetter = jest.spyOn(Document.prototype, 'cookie', 'set');
@@ -61,7 +61,7 @@ beforeEach(() => {
 
 afterEach(() => {
     cookieSetter.mockRestore();
-    Object.defineProperty(window, 'location', {value: realLocation, writable: true, configurable: true});
+    setDocumentURL(realURL);
 });
 
 describe('ExperienceCookie', () => {

@@ -9,6 +9,9 @@ declare global {
             arrayContaining<E = unknown>(arr: readonly E[]): unknown;
         }
     }
+
+    /** Points jsdom at the given URL without navigating or loading anything. Defined by `jest/environment.ts` */
+    function setDocumentURL(url: string): void;
 }
 
 export {};

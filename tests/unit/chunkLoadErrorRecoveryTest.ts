@@ -22,6 +22,8 @@ import retryDynamicImport from '@src/utils/retryDynamicImport';
 
 import type {ComponentType} from 'react';
 
+import interceptWindowNavigation from '../utils/interceptWindowNavigation';
+
 const mockClearWorkboxRecoveryCaches = jest.fn();
 jest.mock('@libs/clearWorkboxRecoveryCaches', () => ({
     __esModule: true,
@@ -58,24 +60,17 @@ describe('ChunkLoadError recovery', () => {
     let reloadMock: jest.Mock;
     // Records the order in which clear and reload are called within each test.
     const callOrder: string[] = [];
-    // Preserve the original location so the override does not leak between test files.
-    const originalLocation = window.location;
+    let restoreNavigation: () => void;
 
     beforeAll(() => {
         reloadMock = jest.fn().mockImplementation(() => {
             callOrder.push('reload');
         });
-        Object.defineProperty(window, 'location', {
-            configurable: true,
-            value: {reload: reloadMock},
-        });
+        restoreNavigation = interceptWindowNavigation({reload: reloadMock});
     });
 
     afterAll(() => {
-        Object.defineProperty(window, 'location', {
-            configurable: true,
-            value: originalLocation,
-        });
+        restoreNavigation();
     });
 
     beforeEach(() => {
